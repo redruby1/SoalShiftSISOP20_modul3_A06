@@ -7,54 +7,58 @@
 #include <sys/wait.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <time.h>
 
 pthread_t tid[5];
+int i, j, k;
 int count = 0;
-int i, j, k, hasil = 0;
 
-int A[4][2] = { {1,2}, {3,4}, {5,6}, {7,8} };
-int B[2][5] = { {11,12,13,14,15}, {16,17,18,19,20} };
+int A[5][5] = { {1,2}, {3,4}, {5,6}, {7,8} };
+int B[5][5] = { {11,12,13,14,15}, {16,17,18,19,20} };
 
-int C[4][5]; //result
+int C[5][5] = {0}; //result
 
-void *multi(void *arg) {
-    int core = count++;
-
-    for(i=(core*5)/5; i<((core+1)*5)/5; i++) {
-    	for(j=0; j<5; j++) {
-        	for(k=0; k<5; k++) {
+void *multip(void *arg) {
+	int core = count++; 
+	
+	for(i=(core*5)/5; i<((core+1)*5)/5; i++) {
+        for(j=0; j<5; j++) {
+            for(k=0; k<5; k++) {
             	C[i][j] += A[i][k] * B[k][j];
 			}
-		}
-	}
-}
+        }	
+    }
+} 
 
 int main() {
-	key_t key = 5678;
+	key_t key = 1234;
+	int *angka;
 	
-	int shmid = shmget(key, sizeof(int)*5*4, IPC_CREAT | 0666);
-	C[4][5] = shmat(shmid, NULL, 0);
+	int shmid = shmget(key, sizeof(int)*5*5, IPC_CREAT | 0666);
+	angka = shmat(shmid, NULL, 0);
 	
-	memset(C, 0, sizeof(C));
-	
-	for(i=0; i<5; i++) { 
-		int *p; 
-		pthread_create(&tid[i], NULL, multi, (void*)(p));
-    }
+	for(i=0; i<5; i++) {
+		pthread_create(&tid[i], NULL, multip, (void*)&i);
+	}
     
 	for(i=0; i<5; i++) {
 		pthread_join(tid[i], NULL);
 	}
 	
-	for(i=0; i<4; i++) { 
+	for(i=0; i<4; i++) {
         for(j=0; j<5; j++) {
+			angka[i*5 + j] = C[i][j];
         	printf("%d\t", C[i][j]);
+        	
+        	sleep(1);
 		}
-        printf("\n");
+	printf("\n");
     }
     
-    shmdt(C);
-//    shmctl(shmid, IPC_RMID, NULL);
+	sleep(20);
     
-    return 0; 
+	shmdt(angka);
+	shmctl(shmid, IPC_RMID, NULL);
+    
+	return 0; 
 }
