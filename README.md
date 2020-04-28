@@ -94,6 +94,97 @@ juga menggunakan fork-exec dan system.**
 
 **Kendala :** Program belum bisa membuat folder, dan memindahkan file ke dalam folder yang sesuai
 
+
+**Buatlah sebuah program dari C untuk mengkategorikan file. Program ini akan
+memindahkan file sesuai ekstensinya (tidak case sensitive. JPG dan jpg adalah
+sama) ke dalam folder sesuai ekstensinya yang folder hasilnya terdapat di working
+directory ketika program kategori tersebut dijalankan.**
+**Pada opsi -f tersebut, user bisa menambahkan argumen file yang bisa
+dikategorikan sebanyak yang user inginkan seperti contoh di atas.**
+
+**Coba revisi**
+```
+int main(int argc, char *argv[])
+{
+	if(!strcmp(argv[1], "-f"))
+	{
+			char *file[10000];
+			int i, j;
+			int k;
+			pthread_t thread[100;]
+		   for(i=2; i<argc+1; i++)
+		   {
+		   		file[i-1] = argv[i];
+		   }
+		   
+			for(j=1; j<argc+1; j++)
+		   {
+		   		pthread_create(&thread[j], NULL, ekstensi_f, (void *) file[j]);
+		   }
+		   
+		   for(k=1; k<argc+1; k++)
+		   {
+		   		pthread_join(thread[k], NULL);
+		   }
+	}
+	
+	...
+}
+```
+
+``` if(!strcmp(argv[1], "-f")) ``` untuk mengetahui apakah argumen adalah '-f' atau tidak
+
+``` for(i=2; i<argc+1; i++)
+	{
+		   file[i-1] = argv[i];
+	}
+```
+untuk memasukkan argumen yang diinputkan setelah '-f' kedalam variabel file untuk digunakan mencari namafile
+
+``` for(j=1; j<argc+1; j++)
+	{
+		  pthread_create(&thread[j], NULL, ekstensi_f, (void *) file[j]);
+	}
+```
+untuk membuat thread agar proses mencari ekstensi menjadi lebih cepat
+		   
+``` for(k=1; k<argc+1; k++)
+	{
+		   pthread_join(thread[k], NULL);
+	}
+``` 
+
+untuk membuat join thread agar thread bisa berjalan
+
+```void *ekstensi_f(void *file)
+{
+	char *ekstensi;
+	ekstensi = strchr(file, '.');
+	if (ekstensi != NULL)
+	{
+		ekstensi++;
+	}
+}
+```
+
+Fungsi untuk mendapatkan ekstensi dari file
+
+**● Pada program kategori tersebut, folder jpg,c,zip tidak dibuat secara manual,
+melainkan melalui program c. Semisal ada file yang tidak memiliki ekstensi,
+maka dia akan disimpan dalam folder “Unknown”.
+● Program kategori ini juga menerima perintah (*) 
+● Hasilnya perintah di atas adalah mengkategorikan file di /path/to/directory dan
+hasilnya akan disimpan di working directory di mana program C tersebut
+berjalan (hasil kategori filenya bukan di /path/to/directory).
+● Program ini tidak rekursif. Semisal di directory yang mau dikategorikan, atau
+menggunakan (*) terdapat folder yang berisi file, maka file dalam folder
+tersebut tidak dihiraukan, cukup file pada 1 level saja.
+● Setiap 1 file yang dikategorikan dioperasikan oleh 1 thread agar bisa berjalan
+secara paralel sehingga proses kategori bisa berjalan lebih cepat. Dilarang
+juga menggunakan fork-exec dan system.**
+
+**Kendala :** Program belum bisa membuat folder, dan memindahkan file ke dalam folder yang sesuai
+
 ## Soal 4
 ### == 4a ==
 1. **Buatlah program C dengan nama "4a.c", yang berisi program untuk melakukan perkalian matriks. Ukuran matriks pertama adalah 4x2, dan matriks kedua 2x5. Isi dari matriks didefinisikan di dalam kodingan. Matriks nantinya akan berisi angka 1-20 (tidak perlu dibuat filter angka).**
